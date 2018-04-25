@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Ultimate Friend Finder App</title>
+	<!-- BOOTSTRAP -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+	  crossorigin="anonymous">
+	<!-- jQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<div class="jumbotron text-center">
+			<h1 class="display-3">Ultimate Friend Finder App</h1>
+			<p class="lead">You are my SPECIAL friend... for LIFE!</p>
+			<hr class="my-4">
+			<br>
+
+			<div class="form-group row">
+				<label for="friendName" class="col-sm-2 col-form-label">NAME</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control valid" id="friendName" placeholder="Name (Required)" required="">
+				</div>
+			</div>
+			<div class="form-group row">
+				<label for="friendPhoto" class="col-sm-2 col-form-label">PHOTO</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control valid" id="friendPhoto" placeholder="Link to image (Required)" required="">
+				</div>
+			</div>
+			<hr class="my-4">
+
+			<div id="questionBank"></div>
+
+			<hr class="my-4">
+			<button type="submit" class="btn btn-primary submit">Submit Survey</button>
+
+
+
+
+		</div>
+	</div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+	// question bank
+	var questionArray = [{
+			"question": "You find it difficult to introduce yourself to other people",
+			"id": "question1"
+		},
+		{
+			"question": "You find it easy to stay relaxed even when there is some pressure",
+			"id": "question2"
+		},
+		{
+			"question": "You are usually highly motivated and energetic",
+			"id": "question3"
+		},
+		{
+			"question": "Your home and work environments are quite tidy",
+			"id": "question4"
+		},
+		{
+			"question": "People can rarely upset you",
+			"id": "question5"
+		},
+		{
+			"question": "In a discussion, truth should be more important than people's sensitivities",
+			"id": "question6"
+		},
+		{
+			"question": "An interesting book or video game is often better than a social event",
+			"id": "question7"
+		},
+		{
+			"question": "You rarely get carried away by fantasies and ideas",
+			"id": "question8"
+		},
+		{
+			"question": "You often find yourself lost in thought when you are walking in nature",
+			"id": "question9"
+		},
+		{
+			"question": "You enjoy going to social events that involve dressing-up",
+			"id": "question10"
+		}
+	];
+	// populate html
+	var html = '';
+	$.each(questionArray, function (key, value) {
+		html += `<div class="col-auto text-left form-group">`;
+		html +=
+			`<label class="mr-sm-2" for="friendSurveyQ${key+1}">[QUESTION ${key+1}] ${questionArray[key].question}</label><br>`;
+		html += `<select class="valid form-control custom-select mb-2 mr-sm-2 mb-sm-0" id="friendQuestion${key+1}">`;
+		html += `<option value="" selected disabled>Choose...</option>`;
+		html += `<option value="1">1 (strongly disagree)</option>`;
+		html += `<option value="2">2</option>`;
+		html += `<option value="3">3 (neutral)</option>`;
+		html += `<option value="4">4</option>`;
+		html += `<option value="5">5 (strongly agree)</option>`;
+		html += `</select>`;
+		html += `</div>`;
+	});
+	$('#questionBank').append(html);
+
+	// below code for submission of survey
+	$('.submit').on('click', function (event) {
+		event.preventDefault();
+
+		function validForm() {
+			var formFill = true;
+
+			$('.valid').each(function () {
+				if ($(this).val() === "") {
+					formFill = false;
+				}
+			});
+			return formFill;
+		}
+
+		if (validForm()) {
+			var newFriend = {
+				name: $('#friendName').val().trim(),
+				photo: $('#friendPhoto').val().trim(),
+				scores: [
+					$("#friendQuestion1").val(),
+					$("#friendQuestion2").val(),
+					$("#friendQuestion3").val(),
+					$("#friendQuestion4").val(),
+					$("#friendQuestion5").val(),
+					$("#friendQuestion6").val(),
+					$("#friendQuestion7").val(),
+					$("#friendQuestion8").val(),
+					$("#friendQuestion9").val(),
+					$("#friendQuestion10").val()
+				]
+			};
+
+			var currentURL = window.location.origin;
+
+			$.post(currentURL + '/api/friends', newFriend, function (data) {
+				console.log(data.photo)
+
+				$("#friendName").text(data.name);
+				$("#friendPic").attr("src", data.photo)
+				console.log($("#friendPic").attr("src", data.photo))
+			});
+
+			// clear form after submission
+			$('#friendName').val('');
+			$('#friendPhoto').val('');
+			$('#friendQuestion1').val(''),
+				$('#friendQuestion2').val(''),
+				$('#friendQuestion3').val(''),
+				$('#friendQuestion4').val(''),
+				$('#friendQuestion5').val(''),
+				$('#friendQuestion6').val(''),
+				$('#friendQuestion7').val(''),
+				$('#friendQuestion8').val(''),
+				$('#friendQuestion9').val(''),
+				$('#friendQuestion10').val('')
+		} else {
+			alert('Please complete the survey by filling in all blanks');
+		};
+	});
+</script>
